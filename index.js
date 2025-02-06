@@ -8,7 +8,7 @@ import colors from 'colors'
 import userRoutes from './src/Routes/user.routes.js'
 import connectDB from './src/Config/db.js'
 
-const allowedOrigins = ['*']
+const allowedOrigins = ['http://localhost:5173']
 
 dotenv.config()
 
