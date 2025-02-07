@@ -2,7 +2,10 @@ import User from '../Models/user.model.js'
 import bcrypt from 'bcryptjs'
 import { generateToken } from '../Utils/jwtUtils.js'
 import { OAuth2Client } from 'google-auth-library'
-import uploadToImagekit from '../Utils/uploadImagekit.js'
+import {
+  deleteFromImagekit,
+  uploadToImagekit,
+} from '../Utils/imagekit-service.js'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -21,17 +24,18 @@ export const signUp = async (req, res, next) => {
 
     const hashedPass = await bcrypt.hash(password, 10)
 
-    let fileUrl = null
+    let uploadedFile = null
 
     if (req.file) {
-      fileUrl = await uploadToImagekit(req.file)
+      uploadedFile = await uploadToImagekit(req.file)
     }
 
     const newUser = new User({
       name,
       email,
       password: hashedPass,
-      profileImage: fileUrl ? fileUrl : dummyProfile,
+      profileImage: uploadedFile ? uploadedFile.url : dummyProfile,
+      fileId: uploadedFile.fileId,
     })
     newUser.save()
     res.status(201).json({ message: 'User created successfully' })
@@ -58,6 +62,7 @@ export const googleSignup = async (req, res, next) => {
         name,
         email,
         profileImage: picture,
+        fileId: null,
         googleId: sub,
         password: null,
       })
@@ -97,7 +102,7 @@ export const login = async (req, res, next) => {
       email: isAvailable.email,
     })
 
-    res.status(200).json({ isAvailable, token: jwtToken })
+    res.status(200).json({ user: isAvailable, token: jwtToken })
   } catch (err) {
     next(err)
   }
@@ -110,6 +115,37 @@ export const getUserProfile = async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' })
     }
     res.status(200).json(user)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const updateUserProfile = async (req, res, next) => {
+  try {
+    const userId = req.params.userId
+    const { name, email } = req.body
+
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    let newProfileImage = user.profileImage
+    let oldImage = { url: user.profileImage, fileId: user.fileId }
+
+    if (req.file) {
+      await deleteFromImagekit(oldImage)
+      newProfileImage = await uploadToImagekit(req.file, 'profileImage')
+    }
+
+    user.name = name || user.name
+    user.email = email || user.email
+    user.profileImage = newProfileImage.url
+    user.fileId = newProfileImage.fileId
+
+    await user.save()
+
+    res.status(200).json({ message: 'Profile updated successfully', user })
   } catch (err) {
     next(err)
   }

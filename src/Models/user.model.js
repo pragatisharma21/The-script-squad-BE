@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String, unique: true },
     phoneNumber: { type: String },
     profileImage: { type: String },
+    fileId: { type: String },
     readingPreferences: [{ type: String }],
   },
   { timestamps: true },
