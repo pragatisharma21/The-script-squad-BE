@@ -114,7 +114,16 @@ export const getUserProfile = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
-    res.status(200).json(user)
+
+    const data = {
+      _id : user._id,
+      name: user.name,
+      email: user.email,
+      profileImage: user.profileImage,
+      fileId: user.fileId,
+      googleId: user?.googleId
+    }
+    res.status(200).json(data)
   } catch (err) {
     next(err)
   }

@@ -13,7 +13,7 @@ const router = express.Router()
 router.post('/signup', upload.single('profileImage'), signUp)
 router.post('/googleSignup', googleSignup)
 router.post('/login', login)
-router.get('/profile/:id', getUserProfile)
+router.get('/profile/:getUserProfile', getUserProfile)
 
 router.put('/updateProfile/:userId', upload.single('profileImage'), updateUserProfile)
 
