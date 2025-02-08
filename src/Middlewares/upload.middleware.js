@@ -16,6 +16,15 @@ const fileFilter = (req, file, cb) => {
   }
 }
 
-const upload = multer({ storage, fileFilter })
+const uploadProfileImage = multer({ storage, fileFilter }).single(
+  'profileImage',
+)
 
-export default upload
+const uploadBookFiles = multer({ storage, fileFilter }).fields([
+  { name: 'coverImage', maxCount: 1 },
+  { name: 'bookPdf', maxCount: 1 },
+])
+
+const uploadCoverImage = multer({ storage, fileFilter }).single('coverImage')
+
+export { uploadProfileImage, uploadBookFiles, uploadCoverImage }

@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String },
+    isPasswordCreated: { type: Boolean, default: false },
     googleId: { type: String, unique: true },
     phoneNumber: { type: String },
     userType: {
@@ -13,7 +14,9 @@ const userSchema = new mongoose.Schema(
       default: 'DEFAULT',
     },
     profileImage: { type: String },
-    myBooks: { type: [] },
+    myBooks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
+    myCart: [{type: mongoose.Schema.Types.ObjectId, ref:"Book"}],
+    myWishList: [{type: mongoose.Schema.Types.ObjectId, ref:"Book"}],
     fileId: { type: String },
     readingPreferences: [{ type: String }],
   },

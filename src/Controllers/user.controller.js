@@ -27,13 +27,14 @@ export const signUp = async (req, res, next) => {
     let uploadedFile = null
 
     if (req.file) {
-      uploadedFile = await uploadToImagekit(req.file)
+      uploadedFile = await uploadToImagekit(req.file, 'profileImage')
     }
 
     const newUser = new User({
       name,
       email,
       password: hashedPass,
+      isPasswordCreated: true,
       profileImage: uploadedFile ? uploadedFile.url : dummyProfile,
       fileId: uploadedFile.fileId,
     })
@@ -72,6 +73,7 @@ export const googleSignup = async (req, res, next) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      userType: user.userType,
     })
 
     res.status(200).json({ user, token: jwtToken })
@@ -156,6 +158,47 @@ export const updateUserProfile = async (req, res, next) => {
     await user.save()
 
     res.status(200).json({ message: 'Profile updated successfully', user })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const getMyBooks = async (req, res, next) => {
+  try {
+    const userId = req.user._id
+    const user = await User.findById(userId).populate('myBooks')
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const myBooks = user.myBooks
+    return res.status(200).json({ books: myBooks })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const updateUserType = async (req, res, next) => {
+  try {
+    const { userId } = req.params
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    if (user.userType === 'DEFAULT') {
+      user.userType = 'FLEET_ADMIN'
+      await user.save()
+      return res
+        .status(200)
+        .json({ message: 'User role updated to FLEET_ADMIN', user })
+    } else {
+      return res
+        .status(400)
+        .json({ message: 'User is already an admin or not in DEFAULT state' })
+    }
   } catch (err) {
     next(err)
   }

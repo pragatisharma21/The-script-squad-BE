@@ -8,6 +8,7 @@ import colors from 'colors'
 import userRoutes from './src/Routes/user.routes.js'
 import reviewRoutes from './src/Routes/review.routes.js'
 import paymentRoutes from './src/Routes/payment.routes.js'
+import adminRoutes from './src/Routes/admin.routes.js'
 import connectDB from './src/Config/db.js'
 import bookRoutes from './src/Routes/book.routes.js'
 
@@ -29,7 +30,7 @@ app.use(
   CORS({
     origin: allowedOrigins,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   }),
 )
 
@@ -42,6 +43,8 @@ app.use('/api/review', reviewRoutes)
 app.use('/api/payments', paymentRoutes)
 
 app.use('/api/books', bookRoutes)
+
+app.use('/api/admin', adminRoutes)
 
 app.use(errorHandler)
 

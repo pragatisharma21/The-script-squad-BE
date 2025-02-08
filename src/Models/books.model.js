@@ -17,13 +17,6 @@ const bookSchema = new mongoose.Schema(
     genre: { type: String, required: true },
     price: { type: Number, required: true, min: 1 },
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
-    comments: [
-      {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        commentText: { type: String },
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
     available: { type: Boolean, default: true },
   },
   { timestamps: true },
@@ -36,6 +29,15 @@ bookSchema.virtual('rating').get(function () {
     0,
   )
   return totalRating / this.reviews.length
+})
+
+bookSchema.virtual('reviewsCount').get(function () {
+  return this.reviews.length
+})
+
+bookSchema.pre('remove', async function (next) {
+  await mongoose.model('Review').deleteMany({ bookId: this._id })
+  next()
 })
 
 const Book = mongoose.model('Book', bookSchema)
