@@ -6,6 +6,7 @@ import errorHandler from './src/Middlewares/errorhandler.middleware.js'
 import colors from 'colors'
 
 import userRoutes from './src/Routes/user.routes.js'
+import reviewRoutes from './src/Routes/review.routes.js'
 import connectDB from './src/Config/db.js'
 import bookRouter from './src/Routes/book.routes.js'
 
@@ -36,6 +37,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/user', userRoutes)
+app.use('/api/review', reviewRoutes)
 
 app.use('/api/books', bookRouter)
 
