@@ -10,3 +10,4 @@ const imagekitSetup = new ImageKit({
 })
 
 export default imagekitSetup
+  

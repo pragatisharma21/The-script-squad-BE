@@ -4,13 +4,14 @@ import Book from "../Models/books.model.js"
 let dummyImage = "https://img.freepik.com/free-vector/blank-book-cover-white-vector-illustration_1284-41903.jpg?t=st=1738850444~exp=1738854044~hmac=14fe4ab743d8e3961edd500b97daff73b1f90f1613969cfc358b80277f385a75&w=740";
 
 // Function to upload an image or PDF to ImageKit
-const uploadFile = async (fileData, fileName) => {
+const uploadFile = async (fileData = "e:\WRsLEAAAQBAJ.jpg", fileName = "title") => {
     try {
         console.log(fileData)
         const result = await imagekitSetup.upload({
             file: fileData, // base64-encoded file or a URL
             fileName: fileName, // any file name you want
         });
+        console.log(result);
         return result;
     } catch (error) {
         throw new Error('Image/PDF upload failed');
@@ -29,9 +30,10 @@ const deleteFile = async (fileId) => {
 export const addBook = async (req, res, next) => {
     try {
         const { title, author, description,coverImage, pdfUrl, genre } = req.body;
+        console.log(req.body);
         const fileUrl = dummyImage;
         if(coverImage)
-            fileUrl = await uploadFile(coverImage, title);
+            fileUrl = await uploadFile();
         const newBook = new Book({
             title,
             author,
