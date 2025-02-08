@@ -6,6 +6,7 @@ import {
   deleteFromImagekit,
   uploadToImagekit,
 } from '../Utils/imagekit-service.js'
+import Book from '../Models/books.model.js'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -199,6 +200,76 @@ export const updateUserType = async (req, res, next) => {
         .status(400)
         .json({ message: 'User is already an admin or not in DEFAULT state' })
     }
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const addToCart = async (req, res, next) => {
+  try {
+    const { userId, bookId } = req.params
+
+    const user = await User.findById(userId)
+    if (!user) return res.status(404).json({ message: 'User not found' })
+
+    const book = await Book.findById(bookId)
+    if (!book) return res.status(404).json({ message: 'Book not found' })
+
+    if (!user.myCart.includes(bookId)) {
+      user.myCart.push(bookId)
+      await user.save()
+    }
+
+    res.status(200).json({ message: 'Book added to cart', myCart: user.myCart })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const addToWishList = async (req, res, next) => {
+  try {
+    const { userId, bookId } = req.params
+
+    const user = await User.findById(userId)
+    if (!user) return res.status(404).json({ message: 'User not found' })
+
+    const book = await Book.findById(bookId)
+    if (!book) return res.status(404).json({ message: 'Book not found' })
+
+    if (!user.myWishList.includes(bookId)) {
+      user.myWishList.push(bookId)
+      await user.save()
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Book added to wishlist', myWishList: user.myWishList })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const getMyCart = async (req, res, next) => {
+  try {
+    const { userId } = req.params
+
+    const user = await User.findById(userId).populate('myCart')
+    if (!user) return res.status(404).json({ message: 'User not found' })
+
+    res.status(200).json({ myCart: user.myCart })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const getMyWishlist = async (req, res, next) => {
+  try {
+    const { userId } = req.params
+
+    const user = await User.findById(userId).populate('myWishList')
+    if (!user) return res.status(404).json({ message: 'User not found' })
+
+    res.status(200).json({ myWishList: user.myWishList })
   } catch (err) {
     next(err)
   }

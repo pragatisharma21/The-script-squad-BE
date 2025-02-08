@@ -1,6 +1,10 @@
 import express from 'express'
 import {
+  addToCart,
+  addToWishList,
   getMyBooks,
+  getMyCart,
+  getMyWishlist,
   getUserProfile,
   googleSignup,
   login,
@@ -17,6 +21,10 @@ router.post('/googleSignup', googleSignup)
 router.post('/login', login)
 router.get('/profile/:id', isAuthenticated, getUserProfile)
 router.get('/myBooks', isAuthenticated, getMyBooks)
+router.post('/add-to-cart/:userId/:bookId', isAuthenticated, addToCart)
+router.post('/add-to-wishlist/:userId/:bookId', isAuthenticated, addToWishList)
+router.get('/cart/:userId', isAuthenticated, getMyCart)
+router.get('/wishlist/:userId', isAuthenticated, getMyWishlist)
 
 router.put(
   '/updateProfile/:userId',
