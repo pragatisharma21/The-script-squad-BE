@@ -7,6 +7,7 @@ import colors from 'colors'
 
 import userRoutes from './src/Routes/user.routes.js'
 import reviewRoutes from './src/Routes/review.routes.js'
+import paymentRoutes from './src/Routes/payment.routes.js'
 import connectDB from './src/Config/db.js'
 import bookRoutes from './src/Routes/book.routes.js'
 
@@ -38,6 +39,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/user', userRoutes)
 app.use('/api/review', reviewRoutes)
+app.use('/api/payments', paymentRoutes)
 
 app.use('/api/books', bookRoutes)
 
