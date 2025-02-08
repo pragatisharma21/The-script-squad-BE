@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String },
     googleId: { type: String, unique: true },
     phoneNumber: { type: String },
+    userType: {type: String, enum: ["DEFAULT", "FLEET_ADMIN", "ADMIN"], default: "DEFAULT"},
     profileImage: { type: String },
     fileId: { type: String },
     readingPreferences: [{ type: String }],
