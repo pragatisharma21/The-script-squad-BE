@@ -1,3 +1,0 @@
-[ERROR] 2025-02-06 15:56:27 - Error: bcrypt is not defined | URL: /api/user/signup | Method: POST
-[INFO] 2025-02-06 15:56:27 - POST /api/user/signup [31m500[0m 40.498ms - PostmanRuntime/7.43.0
-[INFO] 2025-02-06 15:56:56 - POST /api/user/signup [32m201[0m 97.842ms - PostmanRuntime/7.43.0
