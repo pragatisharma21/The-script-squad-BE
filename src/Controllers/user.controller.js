@@ -100,6 +100,7 @@ export const login = async (req, res, next) => {
       id: isAvailable._id,
       name: isAvailable.name,
       email: isAvailable.email,
+      userType: isAvailable.userType,
     })
 
     res.status(200).json({ user: isAvailable, token: jwtToken })
@@ -116,12 +117,12 @@ export const getUserProfile = async (req, res, next) => {
     }
 
     const data = {
-      _id : user._id,
+      _id: user._id,
       name: user.name,
       email: user.email,
       profileImage: user.profileImage,
       fileId: user.fileId,
-      googleId: user?.googleId
+      googleId: user?.googleId,
     }
     res.status(200).json(data)
   } catch (err) {
