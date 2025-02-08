@@ -132,7 +132,7 @@ export const getUserProfile = async (req, res, next) => {
 export const updateUserProfile = async (req, res, next) => {
   try {
     const userId = req.params.userId
-    const { name, email } = req.body
+    const { name, phoneNumber } = req.body
 
     const user = await User.findById(userId)
     if (!user) {
@@ -148,7 +148,7 @@ export const updateUserProfile = async (req, res, next) => {
     }
 
     user.name = name || user.name
-    user.email = email || user.email
+    user.phoneNumber = phoneNumber || user.phoneNumber
     user.profileImage = newProfileImage.url
     user.fileId = newProfileImage.fileId
 

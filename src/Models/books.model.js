@@ -10,6 +10,7 @@ const bookSchema = new mongoose.Schema(
     coverImage: { type: String, required: true },
     coverImageFileId: { type: String },
     genre: { type: String, required: true },
+    price: { type: Number, required: true, min: 1},
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
     comments: [
       {
