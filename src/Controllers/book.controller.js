@@ -6,20 +6,23 @@ let dummyImage = "https://img.freepik.com/free-vector/blank-book-cover-white-vec
 
 export const addBook = async (req, res, next) => {
     try {
-        const { title, author, description, pdfUrl, genre } = req.body;
-        let fileUrl = null;
-        console.log(req.file);
+        const { title, author, description, pdfUrl, genre, price, userId } = req.body;
+        console.log(req.file, req.body);
+        let coverImage = null;
         if (req.file)
-            fileUrl = await uploadToImagekit(req.file);
+            coverImage = await uploadToImagekit(req.file);
 
-        console.log(fileUrl);
+        console.log(coverImage);
         const newBook = new Book({
             title,
             author,
             description,
-            pdfUrl,
-            coverImage: fileUrl ? fileUrl.url : dummyImage,
-            genre
+            userId,
+            pdfUrl: pdfUrl,
+            coverImage: coverImage ? coverImage.url : dummyImage,
+            genre,
+            coverImageFileId: coverImage.fileId,
+            price
         })
         await newBook.save();
         res.status(201).json({ message: 'New book added successfully.' });
@@ -49,7 +52,7 @@ export const searchBooks = async (req, res, next) => {
 export const updateBook = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { name, genre, description } = req.body;
+        const { title, genre, description, price } = req.body;
         let updateCoverImage = null;
 
         const book = await Book.findById(id);
@@ -62,10 +65,11 @@ export const updateBook = async (req, res, next) => {
             newCoverImage = await uploadToImagekit(req.file, 'coverImage');
         }
 
-        book.name = name || book.name;
+        book.title = title || book.title;
         book.genre = genre || book.genre;
         book.coverImage = newCoverImage.url;
         book.description = description || book.description;
+        book.price = price || book.price;
 
         await book.save();
         res.status(200).json({ message: "Book updated successfully", book });
@@ -82,9 +86,9 @@ export const deleteBookById = async (req, res, next) => {
 
         if (!book) return res.status(404).json({ error: 'Book not found' });
 
-        let coverImage ={url: book.coverImage, fileId: book.fileId};
+        let coverImage = { url: book.coverImage, fileId: book.fileId };
         await deleteFromImagekit(coverImage);
-        
+
         await Book.findByIdAndDelete(id);
 
         res.status(200).json({ message: 'Book deleted successfully' });

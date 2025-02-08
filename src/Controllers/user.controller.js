@@ -37,7 +37,7 @@ export const signUp = async (req, res, next) => {
       profileImage: uploadedFile ? uploadedFile.url : dummyProfile,
       fileId: uploadedFile.fileId,
     })
-    newUser.save()
+    await newUser.save()
     res.status(201).json({ message: 'User created successfully' })
   } catch (err) {
     next(err)
