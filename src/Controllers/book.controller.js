@@ -6,19 +6,22 @@ let dummyImage = "https://img.freepik.com/free-vector/blank-book-cover-white-vec
 
 export const addBook = async (req, res, next) => {
     try {
-        const { title, author, description, pdfUrl, genre, price, userId } = req.body;
-        console.log(req.file, req.body);
+        const { title, author, description, pdfUrl, genre, price } = req.body;
+        // console.log(req.file, req.body);
         let coverImage = null;
         if (req.file)
             coverImage = await uploadToImagekit(req.file);
 
-        console.log(coverImage);
+        if(!req.user)
+            return res.status(401).json({massase: "Please login to add the book"});
+
+        // console.log(coverImage);
         const newBook = new Book({
             title,
             author,
             description,
-            userId,
-            pdfUrl: pdfUrl,
+            userId: req.user.id,
+            pdfUrl,
             coverImage: coverImage ? coverImage.url : dummyImage,
             genre,
             coverImageFileId: coverImage.fileId,
