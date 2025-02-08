@@ -9,7 +9,7 @@ import userRoutes from './src/Routes/user.routes.js'
 import connectDB from './src/Config/db.js'
 import bookRouter from './src/Routes/book.routes.js'
 
-const allowedOrigins = ['*']
+const allowedOrigins = ['http://localhost:5173']
 
 dotenv.config()
 
