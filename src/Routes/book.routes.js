@@ -5,7 +5,7 @@ import authMiddleware from '../Middlewares/auth.middleware.js';
 
 const router = express.Router()
 
-router.post('/add',authMiddleware, upload.single('coverImage'), addBook);
+router.post('/add', authMiddleware, upload.single('coverImage'), addBook);
 router.get('/search', searchBooks);
 router.put('/update/:id', upload.single('coverImage'), updateBook);
 router.delete('/delete/:id', deleteBookById);

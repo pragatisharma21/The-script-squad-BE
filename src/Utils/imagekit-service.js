@@ -34,7 +34,7 @@ const deleteFromImagekit = async (profileImage) => {
       !profileImage.url ||
       profileImage.url.includes(
         'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png',
-      ) 
+      )
     ) {
       console.log('Skipping deletion: Default profile image detected.')
       return false

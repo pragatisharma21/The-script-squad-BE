@@ -12,8 +12,8 @@ export const addBook = async (req, res, next) => {
         if (req.file)
             coverImage = await uploadToImagekit(req.file);
 
-        if(!req.user)
-            return res.status(401).json({massase: "Please login to add the book"});
+        if (!req.user)
+            return res.status(401).json({ massase: "Please login to add the book" });
 
         // console.log(coverImage);
         const newBook = new Book({

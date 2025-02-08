@@ -8,7 +8,7 @@ import colors from 'colors'
 import userRoutes from './src/Routes/user.routes.js'
 import reviewRoutes from './src/Routes/review.routes.js'
 import connectDB from './src/Config/db.js'
-import bookRouter from './src/Routes/book.routes.js'
+import bookRoutes from './src/Routes/book.routes.js'
 
 const allowedOrigins = ['http://localhost:5173']
 
@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRoutes)
 app.use('/api/review', reviewRoutes)
 
-app.use('/api/books', bookRouter)
+app.use('/api/books', bookRoutes)
 
 app.use(errorHandler)
 
