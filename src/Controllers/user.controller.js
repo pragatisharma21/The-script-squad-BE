@@ -129,7 +129,7 @@ export const getUserProfile = async (req, res, next) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      profileImage: user.profileImage || dummyProfile,
+      profileImage: user.profileImage,
       fileId: user.fileId,
       googleId: user?.googleId,
       userType: user?.userType,
