@@ -7,6 +7,7 @@ import {
   uploadToImagekit,
 } from '../Utils/imagekit-service.js'
 import Book from '../Models/books.model.js'
+import mongoose from 'mongoose'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -56,6 +57,7 @@ export const googleSignup = async (req, res, next) => {
     })
 
     const { name, email, picture, sub } = ticket.getPayload()
+    console.log(name, picture, email, sub)
 
     let user = await User.findOne({ email })
 
@@ -67,7 +69,9 @@ export const googleSignup = async (req, res, next) => {
         fileId: null,
         googleId: sub,
         password: null,
+        userType: 'DEFAULT',
       })
+      user.save()
     }
 
     const jwtToken = generateToken({
@@ -114,7 +118,9 @@ export const login = async (req, res, next) => {
 
 export const getUserProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).select('-password')
+    const userId = req.params.userId
+
+    const user = await User.findOne({ _id: userId })
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
@@ -126,6 +132,7 @@ export const getUserProfile = async (req, res, next) => {
       profileImage: user.profileImage,
       fileId: user.fileId,
       googleId: user?.googleId,
+      userType: user?.userType,
     }
     res.status(200).json(data)
   } catch (err) {
@@ -139,6 +146,8 @@ export const updateUserProfile = async (req, res, next) => {
     const { name, phoneNumber } = req.body
 
     const user = await User.findById(userId)
+
+    console.log(user)
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
@@ -189,7 +198,7 @@ export const updateUserType = async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    if (user.userType === 'DEFAULT') {
+    if (user.userType === 'DEFAULT' || user.userType === 'FLEET_PENDING') {
       user.userType = 'FLEET_ADMIN'
       await user.save()
       return res
@@ -226,6 +235,31 @@ export const addToCart = async (req, res, next) => {
   }
 }
 
+export const removeFromCart = async (req, res, next) => {
+  try {
+    const { userId, bookId } = req.params
+
+    const user = await User.findById(userId)
+    if (!user) return res.status(404).json({ message: 'User not found' })
+
+    const book = await Book.findById(bookId)
+    if (!book) return res.status(404).json({ message: 'Book not found' })
+
+    if (user.myCart.includes(bookId)) {
+      user.myCart = user.myCart.filter((id) => id.toString() !== bookId)
+      await user.save()
+    } else {
+      return res.status(400).json({ message: 'Book not in cart' })
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Book removed from cart', myCart: user.myCart })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const addToWishList = async (req, res, next) => {
   try {
     const { userId, bookId } = req.params
@@ -244,6 +278,32 @@ export const addToWishList = async (req, res, next) => {
     res
       .status(200)
       .json({ message: 'Book added to wishlist', myWishList: user.myWishList })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const removeFromWishlist = async (req, res, next) => {
+  try {
+    const { userId, bookId } = req.params
+
+    const user = await User.findById(userId)
+    if (!user) return res.status(404).json({ message: 'User not found' })
+
+    const book = await Book.findById(bookId)
+    if (!book) return res.status(404).json({ message: 'Book not found' })
+
+    if (user.myWishList.includes(bookId)) {
+      user.myWishList = user.myWishList.filter((id) => id.toString() !== bookId)
+      await user.save()
+    } else {
+      return res.status(400).json({ message: 'Book not in wishlist' })
+    }
+
+    res.status(200).json({
+      message: 'Book removed from wishlist',
+      myWishList: user.myWishList,
+    })
   } catch (err) {
     next(err)
   }
