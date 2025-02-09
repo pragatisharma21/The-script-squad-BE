@@ -138,16 +138,36 @@ export const getPaginatedBooks = async (req, res, next) => {
     const skip = (page - 1) * limit
 
     const books = await Book.find()
+      .populate({
+        path: 'reviews',
+        select: 'rating',
+      })
       .skip(skip)
       .limit(limit)
       .select('-pdfUrl')
+      .lean()
       .exec()
 
     const totalBooks = await Book.countDocuments()
 
+    const booksWithRatings = books.map((book) => {
+      const totalRating = book.reviews.reduce(
+        (sum, review) => sum + review.rating,
+        0,
+      )
+      const rating =
+        book.reviews.length > 0 ? totalRating / book.reviews.length : 0
+
+      return {
+        ...book,
+        rating: parseFloat(rating.toFixed(1)),
+        reviewsCount: book.reviews.length,
+      }
+    })
+
     res.status(200).json({
       success: true,
-      books,
+      books: booksWithRatings,
       pagination: {
         totalBooks,
         totalPages: Math.ceil(totalBooks / limit),

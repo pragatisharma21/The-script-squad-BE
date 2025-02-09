@@ -16,9 +16,17 @@ const fileFilter = (req, file, cb) => {
   }
 }
 
-const uploadProfileImage = multer({ storage, fileFilter }).single(
-  'profileImage',
-)
+const uploadProfileImage = (req, res, next) => {
+  const upload = multer({ storage, fileFilter }).single("profileImage");
+
+  upload(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+    next();
+  });
+};
+
 
 const uploadBookFiles = multer({ storage, fileFilter }).fields([
   { name: 'coverImage', maxCount: 1 },

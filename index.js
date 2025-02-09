@@ -12,7 +12,7 @@ import adminRoutes from './src/Routes/admin.routes.js'
 import connectDB from './src/Config/db.js'
 import bookRoutes from './src/Routes/book.routes.js'
 
-const allowedOrigins = ['http://localhost:5173']
+const allowedOrigins = ['https://the-script-squad-fe.vercel.app','http://localhost:5173']
 
 dotenv.config()
 

@@ -63,12 +63,14 @@ export const verifyPayment = async (req, res, next) => {
 
     if (paymentType === 'BOOK_PURCHASE') {
       await User.findByIdAndUpdate(userId, {
-        $push: { myBooks: { $each: books } },
+        $push: { myBooks: { $each: books.map((book) => book._id) } },
       })
-    }
-    else{
       await User.findByIdAndUpdate(userId, {
-        $set: {userType: "FLEET_PENDING"},
+        $set: { myCart: [] },
+      })
+    } else {
+      await User.findByIdAndUpdate(userId, {
+        $set: { userType: 'FLEET_PENDING' },
       })
     }
 
@@ -80,31 +82,29 @@ export const verifyPayment = async (req, res, next) => {
 
 export const getFleetAdminPayments = async (req, res, next) => {
   try {
-    let { page = 1, limit = 10 } = req.query;
+    let { page = 1, limit = 10 } = req.query
 
+    page = parseInt(page)
+    limit = parseInt(limit)
 
-    page = parseInt(page);
-    limit = parseInt(limit);
+    if (isNaN(page) || page < 1) page = 1
+    if (isNaN(limit) || limit < 1) limit = 10
 
-    if (isNaN(page) || page < 1) page = 1;
-    if (isNaN(limit) || limit < 1) limit = 10;
-
-    const skip = (page - 1) * limit;
-
+    const skip = (page - 1) * limit
 
     const totalPayments = await Payment.countDocuments({
       paymentType: 'FLEET_ADMIN',
       status: 'Success',
-    });
+    })
 
     const payments = await Payment.find({
       paymentType: 'FLEET_ADMIN',
       status: 'Success',
     })
       .populate('userId', 'name email userType')
-      .sort({ createdAt: -1 }) 
+      .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
 
     res.json({
       success: true,
@@ -112,9 +112,8 @@ export const getFleetAdminPayments = async (req, res, next) => {
       totalPages: Math.ceil(totalPayments / limit),
       currentPage: page,
       payments,
-    });
+    })
   } catch (err) {
-    next(err);
+    next(err)
   }
-};
-
+}

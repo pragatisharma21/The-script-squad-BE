@@ -7,7 +7,6 @@ import {
   uploadToImagekit,
 } from '../Utils/imagekit-service.js'
 import Book from '../Models/books.model.js'
-import mongoose from 'mongoose'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -21,11 +20,10 @@ export const signUp = async (req, res, next) => {
     const isExistingUser = await User.findOne({ email })
 
     if (isExistingUser) {
-      res.status(400).json({ message: 'User already Registered' })
+      return res.status(400).json({ message: 'User already Registered' })
     }
 
     const hashedPass = await bcrypt.hash(password, 10)
-
     let uploadedFile = null
 
     if (req.file) {
@@ -38,8 +36,9 @@ export const signUp = async (req, res, next) => {
       password: hashedPass,
       isPasswordCreated: true,
       profileImage: uploadedFile ? uploadedFile.url : dummyProfile,
-      fileId: uploadedFile.fileId,
+      fileId: uploadedFile ? uploadedFile.fileId : null,
     })
+
     await newUser.save()
     res.status(201).json({ message: 'User created successfully' })
   } catch (err) {
@@ -129,7 +128,7 @@ export const getUserProfile = async (req, res, next) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      profileImage: user.profileImage,
+      profileImage: user.profileImage || dummyProfile,
       fileId: user.fileId,
       googleId: user?.googleId,
       userType: user?.userType,
@@ -147,7 +146,6 @@ export const updateUserProfile = async (req, res, next) => {
 
     const user = await User.findById(userId)
 
-    console.log(user)
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
@@ -162,7 +160,7 @@ export const updateUserProfile = async (req, res, next) => {
 
     user.name = name || user.name
     user.phoneNumber = phoneNumber || user.phoneNumber
-    user.profileImage = newProfileImage.url
+    user.profileImage = newProfileImage ? newProfileImage.url : user.profileImage
     user.fileId = newProfileImage.fileId
 
     await user.save()
@@ -175,7 +173,7 @@ export const updateUserProfile = async (req, res, next) => {
 
 export const getMyBooks = async (req, res, next) => {
   try {
-    const userId = req.user._id
+    const userId = req.user.id
     const user = await User.findById(userId).populate('myBooks')
 
     if (!user) {
