@@ -56,7 +56,6 @@ export const googleSignup = async (req, res, next) => {
     })
 
     const { name, email, picture, sub } = ticket.getPayload()
-    console.log(name, picture, email, sub)
 
     let user = await User.findOne({ email })
 
@@ -160,8 +159,10 @@ export const updateUserProfile = async (req, res, next) => {
 
     user.name = name || user.name
     user.phoneNumber = phoneNumber || user.phoneNumber
-    user.profileImage = newProfileImage ? newProfileImage.url : user.profileImage
-    user.fileId = newProfileImage.fileId
+    user.profileImage = newProfileImage.url
+      ? newProfileImage.url
+      : newProfileImage
+    user.fileId = newProfileImage.fileId ? newProfileImage.fileId : user.fileId
 
     await user.save()
 
