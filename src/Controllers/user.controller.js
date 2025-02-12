@@ -7,6 +7,7 @@ import {
   uploadToImagekit,
 } from '../Utils/imagekit-service.js'
 import Book from '../Models/books.model.js'
+import { Payment } from '../Models/payment.model.js'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -329,6 +330,24 @@ export const getMyWishlist = async (req, res, next) => {
     if (!user) return res.status(404).json({ message: 'User not found' })
 
     res.status(200).json({ myWishList: user.myWishList })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const getUserPayments = async (req, res, next) => {
+  try {
+    const userId = req.user.id
+
+    if (!userId) {
+      return res.status(404).json({ message: 'user not found' })
+    }
+
+    const paymentHistory = await Payment.find({ userId }).sort({
+      createdAt: -1,
+    })
+
+    res.status(200).json({ paymentHistory })
   } catch (err) {
     next(err)
   }
